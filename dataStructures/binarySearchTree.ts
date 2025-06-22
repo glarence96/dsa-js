@@ -10,7 +10,6 @@ class TreeNode {
 class BST {
     root: TreeNode;
     add(val: number) {
-        console.log(val)
         if (!this.root) {
             this.root = new TreeNode(val)
             return;
@@ -61,9 +60,8 @@ class BST {
         let currNode = this.root
         if (!currNode) return false
         let present = false
-        while(currNode) {
+        while (currNode) {
             if (val === currNode.data) {
-                console.log(val, currNode.data)
                 present = true
                 break;
             }
@@ -79,28 +77,38 @@ class BST {
     remove(val: number) {
         let currNode = this.root
         if (!currNode) return;
-        while (currNode.data !== val) {
-            if (val > currNode.data) {
-                currNode = currNode.right
+
+        const removeNode = (node: TreeNode, data: number) => {
+            if (data === node.data) {
+                // no children
+                if (!node.left && !node.right) {
+                    return undefined;
+                }
+                if (!node.left) {
+                    return node.right;
+                }
+                if (!node.right) {
+                    return node.left;
+                }
+
+                // both children
+                let minNode = node.right
+                while (minNode.left) {
+                    minNode = minNode.left
+                }
+                node.data = minNode.data
+                node.right = removeNode(node.right, minNode.data)
+                return node
+            } else if (data > node.data) {
+                node.right = removeNode(node.right, data)
+                return node
             } else {
-                currNode = currNode.left
+                node.left = removeNode(node.left, data)
+                return node;
             }
         }
-        if (!currNode.left && !currNode.right) {
-            currNode = undefined
-            return;
-        }
-        if (currNode.right) {
-            const rightNode = currNode.right
-            currNode = rightNode // 36
-            return this.remove(rightNode.data)
-        }
-        if (currNode.left) {
-            const ln = currNode.left
-            currNode = ln
-            return this.remove(ln.data)
-        }
 
+        this.root = removeNode(this.root, val);
     }
 }
 
@@ -117,8 +125,6 @@ bst.add(19);
 bst.add(23);
 bst.add(28);
 
-console.log(bst)
-
 console.log(bst.findMin(), 12);
 console.log(bst.findMax(), 74);
 console.log(bst.isPresent(12), true);
@@ -127,3 +133,7 @@ console.log(bst.isPresent(19), true);
 console.log(bst.isPresent(98), false);
 console.log(bst.remove(12));
 console.log(bst.isPresent(12), false);
+console.log(bst.remove(14));
+console.log(bst.isPresent(14), false);
+console.log(bst.remove(56));
+console.log(bst.isPresent(56), false);
